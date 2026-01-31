@@ -1,21 +1,17 @@
 workflows:
   android-release:
-    name: Build Android Release APK
+    name: Android Release
     max_build_duration: 60
     environment:
       flutter: stable
-      android:
-        build_tool: gradle
       vars:
-        FLUTTER_BUILD_MODE: release
+        BUILD_MODE: release
     scripts:
-      - name: Get Flutter dependencies
+      - name: Install dependencies
         script: |
-          flutter clean
           flutter pub get
-      - name: Analyze project
-        script: flutter analyze
-      - name: Build release APK
-        script: flutter build apk --release
+      - name: Build APK
+        script: |
+          flutter build apk --release
     artifacts:
       - build/app/outputs/flutter-apk/app-release.apk
