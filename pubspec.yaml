@@ -1,34 +1,39 @@
-name: been_market
-description: Yemen Marketplace App Production Ready v5.1
-version: 1.1.0+6
+workflows:
+  build-full-apk:
+    name: 🚀 Build Full APK Yemen Market
+    max_build_duration: 60
+    environment:
+      flutter: stable
 
-environment:
-  sdk: ">=2.20.0 <3.0.0"
+    scripts:
+      # -----------------------------------------------
+      - name: إنشاء مشروع Flutter حديث مؤقت 🛠
+        script: |
+          echo "✅ إنشاء مشروع Flutter حديث temp_project"
+          flutter create -t app temp_project
 
-dependencies:
-  flutter:
-    sdk: flutter
-  cupertino_icons: ^1.0.5
-  provider: ^6.0.5
-  google_fonts: ^4.0.3
-  flutter_svg: ^2.1.1
-  shared_preferences: ^2.1.1
-  http: ^1.1.0
-  flutter_staggered_animations: ^1.1.0
-  firebase_core: ^3.15.2
-  firebase_auth: ^5.7.0
-  cloud_firestore: ^5.6.6
-  animated_list_plus: ^0.5.2
+      # -----------------------------------------------
+      - name: نسخ كود المشروع الأصلي والمصادر 📂
+        script: |
+          echo "📦 نسخ lib, assets, pubspec.yaml إلى temp_project"
+          rsync -a lib/ temp_project/lib/
+          rsync -a assets/ temp_project/assets/ || true
+          cp pubspec.yaml temp_project/
 
-dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^2.0.1
+      # -----------------------------------------------
+      - name: تثبيت dependencies 🔄
+        script: |
+          cd temp_project
+          echo "🔧 تنزيل الحزم"
+          flutter pub get
 
-flutter:
-  uses-material-design: true
-  assets:
-    - assets/images/banner.png
-    - assets/icons/home.svg
-    - assets/icons/cart.svg
-    - assets/icons/profile.svg
+      # -----------------------------------------------
+      - name: بناء APK Release 🚀
+        script: |
+          cd temp_project
+          echo "🔨 بناء APK نسخة release"
+          flutter build apk --release --no-tree-shake-icons
+
+    # -----------------------------------------------
+    artifacts:
+      - temp_project/build/app/outputs/flutter-apk/app-release.apk
